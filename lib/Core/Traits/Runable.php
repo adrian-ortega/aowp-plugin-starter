@@ -1,9 +1,9 @@
 <?php
 
-namespace AOD\Core\Traits;
+namespace AOD\Plugin\Core\Traits;
 
-use AOD\Core\Container;
-use AOD\Core\Loader;
+use AOD\Plugin\Core\Container;
+use AOD\Plugin\Core\Loader;
 
 trait Runable
 {

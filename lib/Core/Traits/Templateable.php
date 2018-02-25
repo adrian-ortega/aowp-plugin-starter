@@ -1,8 +1,8 @@
 <?php
 
-namespace AOD\Core\Traits;
+namespace AOD\Plugin\Core\Traits;
 
-use AOD\Core\Exceptions\RuntimeException;
+use AOD\Plugin\Core\Exceptions\RuntimeException;
 
 class Templateable {
 

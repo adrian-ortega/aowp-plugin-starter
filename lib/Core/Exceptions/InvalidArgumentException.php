@@ -1,6 +1,6 @@
 <?php
 
-namespace AOD\Core\Exceptions;
+namespace AOD\Plugin\Core\Exceptions;
 
 class InvalidArgumentException extends \InvalidArgumentException
 {

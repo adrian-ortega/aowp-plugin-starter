@@ -1,8 +1,8 @@
 <?php
 
-namespace AOD\Core;
+namespace AOD\Plugin\Core;
 
-use AOD\Core\Traits\Runable;
+use AOD\Plugin\Core\Traits\Runable;
 
 class Localization
 {

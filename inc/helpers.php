@@ -1,5 +1,5 @@
 <?php
-namespace AOD;
+namespace AOD\Plugin;
 
 function dd() {
 	foreach(func_get_args() as $arg) {

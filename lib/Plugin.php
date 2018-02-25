@@ -1,11 +1,11 @@
 <?php
 
-namespace AOD;
+namespace AOD\Plugin;
 
-use AOD\Core\Container;
-use AOD\Core\Exceptions\RuntimeException;
-use AOD\Core\Loader;
-use AOD\Core\Localization;
+use AOD\Plugin\Core\Container;
+use AOD\Plugin\Core\Exceptions\RuntimeException;
+use AOD\Plugin\Core\Loader;
+use AOD\Plugin\Core\Localization;
 
 /**
  * Class Plugin
@@ -21,7 +21,7 @@ class Plugin {
 	public function __construct( $plugin_file = null ) {
 
 		if ( empty( $pluginFile ) ) {
-			$plugin_file = realpath(__DIR__ . '/../../index.php');
+			$plugin_file = realpath(__DIR__ . '/../index.php');
 		}
 
 		$this->container = new Container( [

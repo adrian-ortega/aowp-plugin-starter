@@ -1,6 +1,6 @@
 <?php
 
-namespace AOD\Core;
+namespace AOD\Plugin\Core;
 
 class Loader {
 	/**
