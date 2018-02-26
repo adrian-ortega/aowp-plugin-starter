@@ -4,7 +4,7 @@ namespace AOD\Plugin\Core\Traits;
 
 use AOD\Plugin\Core\Exceptions\RuntimeException;
 
-class Templateable {
+trait Templateable {
 
 	protected $useAdminTemplate = false;
 

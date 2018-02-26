@@ -16,5 +16,8 @@
       "inc/helpers.php",
       "inc/template-tags.php"
     ]
+  },
+  "require": {
+    "adrian-ortega/dot-notation-php": "^0.0.0"
   }
 }

@@ -1,12 +1,11 @@
 <?php
 
-namespace AOD\Plugin\Core\Traits;
+namespace AOD\Plugin\Core\Abstracts;
 
 use AOD\Plugin\Core\Container;
 use AOD\Plugin\Core\Loader;
 
-trait Runable
-{
+abstract class Runnable {
 	/**
 	 * @var Container
 	 */
@@ -17,20 +16,20 @@ trait Runable
 	 */
 	protected $loader;
 
-	public function __construct(Container &$container)
-	{
-		$this->init($container);
+	public function __construct( Container &$container ) {
+		$this->init( $container );
 	}
 
 	/**
 	 * Sets the container and loader. Can be used when overriding the __construct method.
+	 *
 	 * @param Container $container
+	 *
 	 * @return $this
 	 */
-	protected function init(Container $container)
-	{
+	protected function init( Container $container ) {
 		$this->container = $container;
-		$this->loader = $container->get('loader');
+		$this->loader    = $container->get( 'loader' );
 
 		return $this;
 	}

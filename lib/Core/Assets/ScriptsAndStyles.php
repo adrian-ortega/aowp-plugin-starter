@@ -1,13 +1,11 @@
 <?php
 
-namespace AOD\Core\Assets;
+namespace AOD\Plugin\Core\Assets;
 
-use AOD\Core\Traits\Runable;
+use AOD\Plugin\Core\Abstracts\Runnable;
 
-class ScriptAndStyles
+class ScriptsAndStyles extends Runnable
 {
-	use Runable;
-
 	/**
 	 * Wether or not this instance is meant to be used in the admin
 	 * @var bool
@@ -193,6 +191,12 @@ class ScriptAndStyles
 		return $this;
 	}
 
+	/**
+	 * @param string $handle
+	 * @param array $items
+	 *
+	 * @return bool|int|string
+	 */
 	private function getItemByHandle($handle, $items)
 	{
 		$idx = -1;
@@ -242,66 +246,68 @@ class ScriptAndStyles
 		return $this;
 	}
 
+	public function enqueue() {
+
+		if(is_callable($this->blocker) && call_user_func($this->blocker, []))
+			return false;
+
+		if($this->admin && $this->media)
+			wp_enqueue_media();
+
+		if(count($this->scripts) > 0) {
+			foreach($this->scripts as $item) {
+				wp_register_script(
+					$this->prefix($item['handle']),
+					$item['source'],
+					$item['dependencies'],
+					$item['version'],
+					$item['footer']
+				);
+			}
+		}
+
+		if(count($this->localizedObjects) > 0) {
+			foreach($this->localizedObjects as $obj) {
+				wp_localize_script($this->prefix($obj['handle']), $obj['object'], $obj['data']);
+			}
+		}
+
+		if(count($this->scripts) > 0) {
+			foreach($this->scripts as $item) {
+				if(is_callable($item['blocker']) && call_user_func_array($item['blocker'], []))
+					continue;
+
+				wp_enqueue_script($this->prefix($item['handle']));
+			}
+		}
+
+		if(count($this->styles) > 0) {
+			foreach($this->styles as $item) {
+				wp_register_style(
+					$this->prefix($item['handle']),
+					$item['source'],
+					$item['dependencies'],
+					$item['version'],
+					$item['screen']
+				);
+			}
+
+			foreach($this->styles as $item) {
+				if(is_callable($item['blocker']) && call_user_func_array($item['blocker'], []))
+					continue;
+
+				wp_enqueue_style($this->prefix($item['handle']));
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public function run()
 	{
-		$this->loader->addAction(($this->admin ? 'admin' : 'wp') . '_enqueue_scripts', function() {
-
-			if(is_callable($this->blocker) && call_user_func($this->blocker, []))
-				return false;
-
-			if($this->admin && $this->media)
-				wp_enqueue_media();
-
-			if(count($this->scripts) > 0) {
-				foreach($this->scripts as $item) {
-					wp_register_script(
-						$this->prefix($item['handle']),
-						$item['source'],
-						$item['dependencies'],
-						$item['version'],
-						$item['footer']
-					);
-				}
-			}
-
-			if(count($this->localizedObjects) > 0) {
-				foreach($this->localizedObjects as $obj) {
-					wp_localize_script($this->prefix($obj['handle']), $obj['object'], $obj['data']);
-				}
-			}
-
-			if(count($this->scripts) > 0) {
-				foreach($this->scripts as $item) {
-					if(is_callable($item['blocker']) && call_user_func_array($item['blocker'], []))
-						continue;
-
-					wp_enqueue_script($this->prefix($item['handle']));
-				}
-			}
-
-			if(count($this->styles) > 0) {
-				foreach($this->styles as $item) {
-					wp_register_style(
-						$this->prefix($item['handle']),
-						$item['source'],
-						$item['dependencies'],
-						$item['version'],
-						$item['screen']
-					);
-				}
-
-				foreach($this->styles as $item) {
-					if(is_callable($item['blocker']) && call_user_func_array($item['blocker'], []))
-						continue;
-
-					wp_enqueue_style($this->prefix($item['handle']));
-				}
-			}
-
-			return true;
-		});
+		$this->loader->addAction( ( $this->admin ? 'admin' : 'wp' ) . '_enqueue_scripts', [ $this, 'enqueue' ] );
 	}
 }

@@ -2,6 +2,8 @@
 
 namespace AOD\Plugin\Core;
 
+use AOD\Plugin\Core\Abstracts\Runnable;
+
 class Loader {
 	/**
 	 * Array of filters to be registered
@@ -100,12 +102,20 @@ class Loader {
 		];
 	}
 
+	/**
+	 * @param string $name
+	 * @param callable $class
+	 */
 	public function addRunable( $name = '', callable $class ) {
 		$this->runables[] = $name;
 		$this->container->set($name, $class);
 	}
 
-	public function getRunables() {
+	/**
+	 * Returns all the registered classes that extend Runable
+	 * @return array|Runnable[]
+	 */
+	public function getRunnables() {
 		return array_map(function($name) {
 			return $this->container->get($name);
 		}, $this->runables);

@@ -1,15 +1,14 @@
 <?php
 
-namespace AOD\Admin;
+namespace AOD\Plugin\Admin;
 
-use AOD\Core\Assets\AdminScriptAndStyles;
-use AOD\Core\Container;
+use AOD\Plugin\Core\Assets\AdminScriptsAndStyles;
+use AOD\Plugin\Core\Container;
 
-class Scripts
-{
+class Scripts {
 	public function __invoke( Container $container ) {
-		$assets = new AdminScriptAndStyles($container);
-		$assets->script('test', $container->get('plugin_url') . 'assets/scripts/test.js');
+		$assets = new AdminScriptsAndStyles( $container );
+		$assets->script( 'admin', $container->get( 'plugin_assets' ) . 'scripts/admin.js' );
 
 		return $assets;
 	}
