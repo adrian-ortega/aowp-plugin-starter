@@ -2,97 +2,72 @@
 
 namespace AOD\Plugin;
 
-use AOD\Plugin\Core\Container;
-use AOD\Plugin\Core\Exceptions\RuntimeException;
-use AOD\Plugin\Core\Loader;
-use AOD\Plugin\Core\Localization;
+use AOD\Plugin\Providers\AssetsServiceProvider;
+use AOD\Plugin\Providers\ConfigServiceProvider;
+use AOD\Plugin\Providers\RequestServiceProvider;
+use AOD\Plugin\Providers\RestServiceProvider;
+use AOD\Plugin\Support\Traits\SingletonTrait;
+use League\Container\Container;
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
+use League\Container\ReflectionContainer;
 
 /**
  * Class Plugin
  * @package AOD
+ *
+ * @property Container $container
  */
-class Plugin {
-	/**
-	 * @var Container
-	 */
-	protected $container;
+class Plugin implements ContainerAwareInterface
+{
+    use SingletonTrait, ContainerAwareTrait;
 
-	/**
-	 * Plugin constructor.
-	 *
-	 * @param null|string $plugin_file
-	 * @param null $plugin_name
-	 * @param string $plugin_version
-	 */
-	public function __construct( $plugin_file = null, $plugin_name = null, $plugin_version = '2018.0.1' ) {
-		if ( empty( $pluginFile ) ) {
-			$plugin_file = realpath( __DIR__ . '/../index.php' );
-		}
+    protected function __construct()
+    {
+        $container = new Container();
+        $this->setContainer( $container );
 
-		$this->container = new Container( [
-			'plugin_file'     => $plugin_file,
-			'plugin_path'     => plugin_dir_path( $plugin_file ),
-			'plugin_url'      => plugin_dir_url( $plugin_file ),
-			'plugin_assets'   => plugin_dir_url( $plugin_file ) . 'assets/',
-			'plugin_basename' => plugin_basename( $plugin_file ),
-			'loader'          => function ( Container &$c ) {
-				return new Loader( $c );
-			},
-		] );
+        // The league container allows us to use Auto-Wiring, here we delegate the ReflectionContainer
+        // to allow the container to resolve objects and their dependencies recursively by inspecting
+        // type hints in your constructor's arguments.
+        //
+        // @reference https://container.thephpleague.com/3.x/auto-wiring/
+        //
+        $container->delegate( new ReflectionContainer );
 
-		if ( ! empty( $plugin_name ) ) {
-			$this->init( $plugin_name, $plugin_version );
-		}
-	}
+        // The container also has the ability to set itself onto other objects if it detects that the
+        // object uses the ContainerAwareInterface just like this object does. You can set your own
+        // custom inflecters to detect instances of a certain class and set it for you.
+        //
+        $container->inflector( ContainerAwareInterface::class )->invokeMethod( 'setContainer', [ $container ]);
 
-	/**
-	 * Initializes the plugin
-	 *
-	 * @param null|string $name
-	 * @param string $version
-	 *
-	 * @return $this
-	 */
-	public function init( $name = null, $version = '2018.0.1' ) {
-		if ( empty( $name ) ) {
-			throw new RuntimeException( 'Please provide a plugin name' );
-		}
+        // Here we start to set different dependencies for the plugin. For the most part, the following
+        // defaults are the ones that are used the most. You can set each dependency by registering it
+        // using a ServiceProvider.
+        //
+        $container->addServiceProvider( RequestServiceProvider::class );
+        $container->addServiceProvider( ConfigServiceProvider::class );
 
-		$this->container->set( 'plugin_name', $name );
-		$this->container->set( 'plugin_version', $version );
-		$this->container->set( 'plugin_text_domain', sanitize_title( $name ) );
-		$this->container->set( 'localization', function ( Container &$c ) {
-			return new Localization( $c );
-		} );
+        //
+        // Add your own service providers here
+        //
 
-		return $this;
-	}
+        // Some services require a few things to be loaded to interact with. We use the `plugins_loaded`
+        // action to make sure we push our services after it.
+        //
+        add_action( 'plugins_loaded', [ $this, 'addPluginDependantProviders' ]);
+    }
 
-	/**
-	 * Adds a runable
-	 *
-	 * @param string $name
-	 * @param mixed|callable $class
-	 *
-	 * @return $this
-	 */
-	public function load( $name, $class ) {
-		$this->container->loader->addRunable( $name, $class );
+    /**
+     * Adds plugin dependant service providers to the container
+     */
+    public function addPluginDependantProviders()
+    {
+        $this->container->addServiceProvider( AssetsServiceProvider::class );
+        $this->container->addServiceProvider( RestServiceProvider::class );
 
-		return $this;
-	}
-
-	/**
-	 * Run
-	 */
-	public function run() {
-		foreach ( $this->container->loader->getRunnables() as $callable ) {
-
-			if ( method_exists( $callable, 'run' ) ) {
-				$callable->run();
-			}
-		}
-
-		$this->container->loader->run();
-	}
+        //
+        // Add your own plugin dependant service providers here
+        //
+    }
 }
