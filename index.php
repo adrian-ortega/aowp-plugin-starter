@@ -17,11 +17,13 @@
  * Domain Path:       /languages
  */
 
-include 'vendor/autoload.php';
+use AOD\Plugin\Plugin as AODPlugin;
 
-$plugin = new \AOD\Plugin\Plugin( __FILE__, 'AOWP Plugin Starer' );
+include __DIR__ . '/vendor/autoload.php';
 
-$plugin->load( 'admin_scripts', new \AOD\Plugin\Admin\Scripts() );
-$plugin->load( 'front_scripts', new \AOD\Plugin\Frontend\Scripts() );
+do_action('aod/before_plugin_loaded');
 
-$plugin->run();
+AODPlugin::getInstance();
+
+do_action('aod/after_plugin_loaded');
+
