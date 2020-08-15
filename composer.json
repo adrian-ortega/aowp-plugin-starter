@@ -18,6 +18,12 @@
     ]
   },
   "require": {
-    "adrian-ortega/dot-notation-php": "^0.0.0"
+    "php": "^5.6",
+    "ext-json": "*",
+    "illuminate/database": "^7.25",
+    "illuminate/pagination": "^5.4",
+    "illuminate/support": "^7.0",
+    "league/container": "^3.3",
+    "league/fractal": "^0.19.2"
   }
 }
