@@ -2,8 +2,11 @@
 
 namespace AOD\Plugin;
 
+use AOD\Plugin\Config\ConfigRepository;
 use AOD\Plugin\Providers\AssetsServiceProvider;
 use AOD\Plugin\Providers\ConfigServiceProvider;
+use AOD\Plugin\Providers\DatabaseMigrationsServiceProvider;
+use AOD\Plugin\Providers\DatabaseServiceProvider;
 use AOD\Plugin\Providers\RequestServiceProvider;
 use AOD\Plugin\Providers\RestServiceProvider;
 use AOD\Plugin\Support\Traits\SingletonTrait;
@@ -47,6 +50,8 @@ class Plugin implements ContainerAwareInterface
         //
         $container->addServiceProvider( RequestServiceProvider::class );
         $container->addServiceProvider( ConfigServiceProvider::class );
+        $container->addServiceProvider( DatabaseServiceProvider::class );
+        $container->addServiceProvider( DatabaseMigrationsServiceProvider::class );
 
         //
         // Add your own service providers here
@@ -69,5 +74,21 @@ class Plugin implements ContainerAwareInterface
         //
         // Add your own plugin dependant service providers here
         //
+    }
+
+    /**
+     * Wrapper for the config class
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function config($key, $default = null)
+    {
+        /**
+         * @var ConfigRepository $config;
+         */
+        $config = $this->container->get( ConfigRepository::class );
+
+        return $config->get( $key, $default );
     }
 }

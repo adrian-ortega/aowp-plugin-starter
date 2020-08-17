@@ -8,7 +8,7 @@
  * Plugin Name:       AOWP Plugin Starer
  * Plugin URI:        https://github.com/adrian-ortega
  * Description:       A Wordpress Plugin Starter
- * Version:           2017.0.1
+ * Version:           2020.8.17
  * Author:            Adrian Ortega
  * Author URI:        https://github.com/adrian-ortega
  * License:           GPL-2.0+
